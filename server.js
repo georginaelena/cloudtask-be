@@ -20,9 +20,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// =====================
 // DATABASE
-// =====================
 const pool = new Pool({
   host: DB_HOST,
   user: DB_USER,
@@ -31,9 +29,7 @@ const pool = new Pool({
   port: Number(DB_PORT),
 });
 
-// =====================
 // AUTH MIDDLEWARE
-// =====================
 function auth(req, res, next) {
   const h = req.headers.authorization;
   if (!h) return res.sendStatus(401);
@@ -47,14 +43,10 @@ function auth(req, res, next) {
   }
 }
 
-// =====================
 // HEALTH CHECK
-// =====================
 app.get("/health", (_, res) => res.json({ ok: true }));
 
-// =====================
 // REGISTER
-// =====================
 app.post("/auth/register", async (req, res) => {
   const { workspaceName, email, password } = req.body;
 
@@ -89,9 +81,7 @@ app.post("/auth/register", async (req, res) => {
   }
 });
 
-// =====================
 // LOGIN
-// =====================
 app.post("/auth/login", async (req, res) => {
   const { workspaceName, email, password } = req.body;
 
@@ -114,9 +104,8 @@ app.post("/auth/login", async (req, res) => {
   res.json({ token });
 });
 
-// =====================
+
 // TASK CRUD
-// =====================
 
 // GET TASKS
 app.get("/tasks", auth, async (req, res) => {
@@ -129,7 +118,7 @@ app.get("/tasks", auth, async (req, res) => {
   res.json(r.rows);
 });
 
-// CREATE TASK (WITH DEADLINE AND notes)
+// CREATE TASK 
 app.post("/tasks", auth, async (req, res) => {
   const { title, priority = "LOW", deadline = null, notes = null } = req.body;
 
@@ -151,7 +140,7 @@ app.post("/tasks", auth, async (req, res) => {
   res.json(r.rows[0]);
 });
 
-// UPDATE TASK (DONE / UNDONE / notes)
+// UPDATE TASK
 app.patch("/tasks/:id", auth, async (req, res) => {
   const { is_done, notes } = req.body;
 
@@ -195,7 +184,6 @@ app.delete("/tasks/:id", auth, async (req, res) => {
   res.sendStatus(204);
 });
 
-// =====================
 app.listen(PORT, () =>
   console.log("API RUNNING ON", PORT)
 );
