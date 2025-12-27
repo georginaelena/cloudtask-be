@@ -129,13 +129,13 @@ app.get("/tasks", auth, async (req, res) => {
   res.json(r.rows);
 });
 
-// CREATE TASK (WITH DEADLINE AND NOTE)
+// CREATE TASK (WITH DEADLINE AND notes)
 app.post("/tasks", auth, async (req, res) => {
-  const { title, priority = "LOW", deadline = null, note = null } = req.body;
+  const { title, priority = "LOW", deadline = null, notes = null } = req.body;
 
   const r = await pool.query(
     `INSERT INTO tasks
-     (workspace_id, created_by, title, priority, deadline, note)
+     (workspace_id, created_by, title, priority, deadline, notes)
      VALUES ($1,$2,$3,$4,$5,$6)
      RETURNING *`,
     [
@@ -144,16 +144,16 @@ app.post("/tasks", auth, async (req, res) => {
       title,
       priority,
       deadline,
-      note,
+      notes,
     ]
   );
 
   res.json(r.rows[0]);
 });
 
-// UPDATE TASK (DONE / UNDONE / NOTE)
+// UPDATE TASK (DONE / UNDONE / notes)
 app.patch("/tasks/:id", auth, async (req, res) => {
-  const { is_done, note } = req.body;
+  const { is_done, notes } = req.body;
 
   const updates = [];
   const values = [];
@@ -163,9 +163,9 @@ app.patch("/tasks/:id", auth, async (req, res) => {
     updates.push(`is_done=$${paramCount++}`);
     values.push(is_done);
   }
-  if (note !== undefined) {
-    updates.push(`note=$${paramCount++}`);
-    values.push(note);
+  if (notes !== undefined) {
+    updates.push(`notes=$${paramCount++}`);
+    values.push(notes);
   }
 
   if (updates.length === 0) {
